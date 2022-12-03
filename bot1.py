@@ -91,7 +91,7 @@ async def echo(message: types.Message):
 		for i in range(len(filt_s)):
 			rez = fuzz.partial_ratio(mess, filt_s[i])
 			print(rez)
-			if rez >= 50:
+			if rez >= 65:
 				answers1 = message.from_user.first_name + ", молчать!\n" + "Мат и оскорбления запрещать в этом чате!\n" + "Социальный рейтинг понижен на 100.", "Партия не поддерживать такие выражения!\nСоциальный рейтинг понижен на 100."
 				await message.answer(answers1[random.randint(0, 1)])
 				await message.delete()
