@@ -38,7 +38,7 @@ flood = 0
 
 
 
-filt = open('/home/orangepi/filt_l.txt', 'r', encoding = 'utf-8')
+filt = open('/home/orangepi/bot/filt_l.txt', 'r', encoding = 'utf-8')
 filt_s = filt.read().split("/")
 print("Andcool Guard Bot приветствовать вас!\nВы добавить меня в группа и сделать админ.\nЯ навести там порядок!")
 @dp.message_handler(content_types=['any'])
