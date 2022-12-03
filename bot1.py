@@ -23,7 +23,7 @@ except Exception:
 	import magic_filter
 
 os.chdir(start_dir)
-os.system("sudo pip3 install fuzzywuzzy python-Levenshtein")
+os.system("sudo pip install fuzzywuzzy python-Levenshtein")
 finded = False
 triggered = False
 #logging.basicConfig(level=logging.INFO)
