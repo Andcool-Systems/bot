@@ -1,5 +1,5 @@
 polit = "путин", "байден", "зеленский", "спецопераци", "войн", "путя", "байдэн"
-
+nah = "кринж", "боже", "бож", "чел"
 import logging
 from datetime import datetime, date, time, timedelta
 from aiogram import Bot, Dispatcher, executor, types
@@ -106,6 +106,17 @@ async def echo(message: types.Message):
 				SocialScore(message.from_user.id, -120, message.chat.id)
 				if triggered == False:
 					print(message.from_user.first_name + ', ' + message.text + " -> polit")
+				triggered = True
+				break
+		
+		
+		for i in range(len(nah)):
+			if mess.find(nah[i]) != -1:
+				await message.answer("Партия приказывать говорить правильно!\nСоциальный рейтинг понижен на 50.")
+				await message.delete()
+				SocialScore(message.from_user.id, -50, message.chat.id)
+				if triggered == False:
+					print(message.from_user.first_name + ', ' + message.text + " -> nah")
 				triggered = True
 				break
 		#-------------------------------------------
