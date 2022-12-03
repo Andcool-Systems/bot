@@ -108,7 +108,9 @@ async def echo(message: types.Message):
 
 		#---------------POLIT-----------------------
 		for i in range(len(polit)):
-			if mess.find(polit[i]) != -1:
+			rez = fuzz.partial_ratio(mess, polit[i])
+			print(rez)
+			if rez >= 65:
 				await message.answer("Партия запрещать обсуждать политика в этом чате!\nСоциальный рейтинг понижен на 120.")
 				await message.delete()
 				SocialScore(message.from_user.id, -120, message.chat.id)
@@ -117,7 +119,9 @@ async def echo(message: types.Message):
 				triggered = True
 				break
 		for i in range(len(nah)):
-			if mess.find(nah[i]) != -1:
+			rez = fuzz.partial_ratio(mess, nah[i])
+			print(rez)
+			if rez >= 65:
 				await message.answer("Партия приказывать говорить правильно!\nСоциальный рейтинг понижен на 50.")
 				await message.delete()
 				SocialScore(message.from_user.id, -50, message.chat.id)
