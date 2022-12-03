@@ -87,6 +87,7 @@ async def echo(message: types.Message):
 		#----------------FILT------------------------
 		for i in range(len(filt_s)):
 			if mess.find(filt_s[i].lower()) != -1:
+				
 				answers1 = message.from_user.first_name + ", молчать!\n" + "Мат и оскорбления запрещать в этом чате!\n" + "Социальный рейтинг понижен на 100.", "Партия не поддерживать такие выражения!\nСоциальный рейтинг понижен на 100."
 				await message.answer(answers1[random.randint(0, 1)])
 				await message.delete()
@@ -127,7 +128,7 @@ async def echo(message: types.Message):
 		if triggered == False:
 			print(message.from_user.first_name + " -> voice")
 		triggered = True
-		SocialScore(message.from_user.id, -50, message.chat.id)
+		#SocialScore(message.from_user.id, -50, message.chat.id)
 		flood = 0
 	#-----------------------------------
 
@@ -151,7 +152,8 @@ async def echo(message: types.Message):
 				dt = datetime.now() + timedelta(hours=12 * sc[2][sc_c])
 				print(12 * sc[2][sc_c])
 				timestamp = dt.timestamp()
-				await message.answer(message.from_user.first_name + "\nВы себя плохо вести!\n" + "Мут на " + str(round(12 * sc[2][sc_c])) + " часа!\n")
+				answers = [message.from_user.first_name + "\nВы себя плохо вести!\n" + "Мут на " + str(round(12 * sc[2][sc_c])) + " часа!\n", "Партия запретить говорить " + message.from_user.first_name + " на " + str(12 * sc[2][sc_c]) + " часов!"]
+				await message.answer(answers[random.randint(0, 1)])
 				await bot.restrict_chat_member(message.chat.id, sc[0][sc_c], types.ChatPermissions(False), until_date = timestamp)
 				
 
