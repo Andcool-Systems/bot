@@ -8,6 +8,9 @@ import numpy as np
 import random
 from temp import printTemp
 import fan
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+
 
 
 start_dir = os.getcwd()
@@ -20,7 +23,7 @@ except Exception:
 	import magic_filter
 
 os.chdir(start_dir)
-
+os.system("sudo pip3 install fuzzywuzzy python-Levenshtein")
 finded = False
 triggered = False
 #logging.basicConfig(level=logging.INFO)
@@ -35,7 +38,7 @@ flood = 0
 
 
 
-filt = open('/home/orangepi/filt_l.txt', 'r', encoding = 'utf-8')
+filt = open('filt_l.txt', 'r', encoding = 'utf-8')
 filt_s = filt.read().split("/")
 print("Andcool Guard Bot приветствовать вас!\nВы добавить меня в группа и сделать админ.\nЯ навести там порядок!")
 @dp.message_handler(content_types=['any'])
@@ -86,12 +89,17 @@ async def echo(message: types.Message):
 
 		#----------------FILT------------------------
 		for i in range(len(filt_s)):
-			if mess.find(filt_s[i].lower()) != -1:
-				
+			rez = fuzz.partial_ratio(mess, filt_s[i])
+			print(rez)
+			if rez >= 50:
 				answers1 = message.from_user.first_name + ", молчать!\n" + "Мат и оскорбления запрещать в этом чате!\n" + "Социальный рейтинг понижен на 100.", "Партия не поддерживать такие выражения!\nСоциальный рейтинг понижен на 100."
 				await message.answer(answers1[random.randint(0, 1)])
 				await message.delete()
 				SocialScore(message.from_user.id, -100, message.chat.id)
+				dt = datetime.now() + timedelta(minutes=15)
+				timestamp = dt.timestamp()
+				flood = 0
+				#await bot.restrict_chat_member(message.chat.id, message.from_user.id, types.ChatPermissions(False), until_date = timestamp)
 				if triggered == False:
 					print(message.from_user.first_name + ', ' + message.text + " -> swearing")
 				triggered = True
@@ -108,8 +116,6 @@ async def echo(message: types.Message):
 					print(message.from_user.first_name + ', ' + message.text + " -> polit")
 				triggered = True
 				break
-		
-		
 		for i in range(len(nah)):
 			if mess.find(nah[i]) != -1:
 				await message.answer("Партия приказывать говорить правильно!\nСоциальный рейтинг понижен на 50.")
@@ -139,7 +145,7 @@ async def echo(message: types.Message):
 		if triggered == False:
 			print(message.from_user.first_name + " -> voice")
 		triggered = True
-		#SocialScore(message.from_user.id, -50, message.chat.id)
+		SocialScore(message.from_user.id, -50, message.chat.id)
 		flood = 0
 	#-----------------------------------
 
@@ -163,8 +169,7 @@ async def echo(message: types.Message):
 				dt = datetime.now() + timedelta(hours=12 * sc[2][sc_c])
 				print(12 * sc[2][sc_c])
 				timestamp = dt.timestamp()
-				answers = [message.from_user.first_name + "\nВы себя плохо вести!\n" + "Мут на " + str(round(12 * sc[2][sc_c])) + " часа!\n", "Партия запретить говорить " + message.from_user.first_name + " на " + str(12 * sc[2][sc_c]) + " часов!"]
-				await message.answer(answers[random.randint(0, 1)])
+				await message.answer(message.from_user.first_name + "\nВы себя плохо вести!\n" + "Мут на " + str(round(12 * sc[2][sc_c])) + " часа!\n")
 				await bot.restrict_chat_member(message.chat.id, sc[0][sc_c], types.ChatPermissions(False), until_date = timestamp)
 				
 
@@ -177,3 +182,4 @@ async def echo(message: types.Message):
 
 if __name__ == "__main__":
 	executor.start_polling(dp, skip_updates=False)
+
