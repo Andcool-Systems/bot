@@ -91,10 +91,6 @@ async def echo(message: types.Message):
 				await message.answer(answers1[random.randint(0, 1)])
 				await message.delete()
 				SocialScore(message.from_user.id, -100, message.chat.id)
-				dt = datetime.now() + timedelta(minutes=15)
-				timestamp = dt.timestamp()
-				flood = 0
-				#await bot.restrict_chat_member(message.chat.id, message.from_user.id, types.ChatPermissions(False), until_date = timestamp)
 				if triggered == False:
 					print(message.from_user.first_name + ', ' + message.text + " -> swearing")
 				triggered = True
