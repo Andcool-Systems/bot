@@ -90,9 +90,7 @@ async def echo(message: types.Message):
 
 		#----------------FILT------------------------
 		for i in range(len(filt_s)):
-			rez = fuzz.partial_ratio(mess, filt_s[i])
-			print(rez)
-			if rez >= 100:
+			if mess.find(filt_s[i].lower()) != -1:
 				answers1 = message.from_user.first_name + ", молчать!\n" + "Мат и оскорбления запрещать в этом чате!\n" + "Социальный рейтинг понижен на 100.", "Партия не поддерживать такие выражения!\nСоциальный рейтинг понижен на 100."
 				await message.answer(answers1[random.randint(0, 1)])
 				await message.delete()
@@ -109,9 +107,7 @@ async def echo(message: types.Message):
 
 		#---------------POLIT-----------------------
 		for i in range(len(polit)):
-			rez = fuzz.partial_ratio(mess, polit[i])
-			print(rez)
-			if rez >= 100:
+			if mess.find(polit[i].lower()) != -1:
 				#await message.answer("Партия запрещать обсуждать политика в этом чате!\nСоциальный рейтинг понижен на 120.")
 				#await message.delete()
 				#SocialScore(message.from_user.id, -120, message.chat.id)
@@ -120,9 +116,7 @@ async def echo(message: types.Message):
 				triggered = True
 				break
 		for i in range(len(nah)):
-			rez = fuzz.partial_ratio(mess, nah[i])
-			print(rez)
-			if rez >= 100:
+			if mess.find(nah[i].lower()) != -1:
 				await message.answer("Партия приказывать говорить правильно!\nСоциальный рейтинг понижен на 50.")
 				await message.delete()
 				SocialScore(message.from_user.id, -50, message.chat.id)
