@@ -108,9 +108,9 @@ async def echo(message: types.Message):
 		#---------------POLIT-----------------------
 		for i in range(len(polit)):
 			if mess.find(polit[i].lower()) != -1:
-				#await message.answer("Партия запрещать обсуждать политика в этом чате!\nСоциальный рейтинг понижен на 120.")
-				#await message.delete()
-				#SocialScore(message.from_user.id, -120, message.chat.id)
+				await message.answer("Партия запрещать обсуждать политика в этом чате!\nСоциальный рейтинг понижен на 120.")
+				await message.delete()
+				SocialScore(message.from_user.id, -120, message.chat.id)
 				if triggered == False:
 					print(message.from_user.first_name + ', ' + message.text + " -> polit")
 				triggered = True
