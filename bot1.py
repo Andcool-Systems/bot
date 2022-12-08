@@ -7,9 +7,12 @@ import os
 import numpy as np
 import random
 from temp import printTemp
+import time
 import fan
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
+os.system("sudo pip install aioschedule")
+time.sleep(10)
 import asyncio
 import aioschedule
 
@@ -34,7 +37,7 @@ bot = Bot(token="5896801600:AAH9EgH0oAaH7C2kxsOsjqqNvj0IIEpr6V0")
 dp = Dispatcher(bot)
 last_id = 0
 flood = 0
-os.system("sudo pip install aioschedule")
+
 
 try:
 	filt = open('/home/orangepi/bot/filt_l.txt', 'r', encoding = 'utf-8')
