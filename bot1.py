@@ -189,7 +189,7 @@ async def choose_your_dinner():
     await bot.send_message(chat_id = -1001847472938, text = "Гов8")
 
 async def scheduler():
-    aioschedule.every().day.at("19:30").do(choose_your_dinner)
+    aioschedule.every().day.at("17:00").do(choose_your_dinner)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
