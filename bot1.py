@@ -10,6 +10,8 @@ from temp import printTemp
 import fan
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
+import asyncio
+import aioschedule
 
 
 
@@ -32,18 +34,18 @@ bot = Bot(token="5896801600:AAH9EgH0oAaH7C2kxsOsjqqNvj0IIEpr6V0")
 dp = Dispatcher(bot)
 last_id = 0
 flood = 0
+os.system("sudo pip install aioschedule")
 
-
-
-
-
-
-filt = open('/home/orangepi/bot/filt_l.txt', 'r', encoding = 'utf-8')
+try:
+	filt = open('/home/orangepi/bot/filt_l.txt', 'r', encoding = 'utf-8')
+except Exception:
+	filt = open('filt_l.txt', 'r', encoding = 'utf-8')
 filt_s = filt.read().split("/")
 print("Andcool Guard Bot приветствовать вас!\nВы добавить меня в группа и сделать админ.\nЯ навести там порядок!")
 @dp.message_handler(content_types=['any'])
 
 async def echo(message: types.Message):
+	print(message.chat.id)
 
 	up_c = 0
 	global last_id
@@ -178,7 +180,19 @@ async def echo(message: types.Message):
 	#------------------------------------------------------------------------------
 
 
+@dp.message_handler()
+async def choose_your_dinner():
+    
+    await bot.send_message(chat_id = -1001847472938, text = "Гов8")
 
+async def scheduler():
+    aioschedule.every().day.at("20:00").do(choose_your_dinner)
+    while True:
+        await aioschedule.run_pending()
+        await asyncio.sleep(1)
+        
+async def on_startup(dp): 
+    asyncio.create_task(scheduler())
 if __name__ == "__main__":
-	executor.start_polling(dp, skip_updates=True)
+	executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
 
