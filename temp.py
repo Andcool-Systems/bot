@@ -2,7 +2,10 @@ from os import popen
 from sys import argv, exit, stdout
 from getopt import getopt
 from time import sleep
-os.system("sudo pip install aioschedule")
+try:
+    os.system("sudo pip install aioschedule")
+except Exception:
+    pass
 def readTemp():
     try:
         file = open("/sys/class/thermal/thermal_zone0/temp", "r")
