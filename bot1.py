@@ -168,7 +168,8 @@ async def echo(message: types.Message):
 		#print(sc[1][sc_c])
 		if sc[1][sc_c] == 0 or sc[1][sc_c] < 0:
 			
-			if sc[0][sc_c] != 1197005557:
+			member = await bot.get_chat_member(message.chat.id, message.from_user.id)
+			if member.is_chat_admin():
 				sc[2][sc_c] += 1
 				dt = datetime.now() + timedelta(hours=12 * sc[2][sc_c])
 				print(12 * sc[2][sc_c])
