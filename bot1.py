@@ -7,12 +7,9 @@ import os
 import numpy as np
 import random
 from temp import printTemp
-import time
 import fan
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
-
-time.sleep(10)
 import asyncio
 import aioschedule
 
@@ -21,10 +18,10 @@ import aioschedule
 start_dir = os.getcwd()
 try:
 	os.chdir(sys._MEIPASS)
-	from socialc import SocialScore, show
+	from socialc import SocialScore, show, SocialScore_set, SocialScore_setp
 	import magic_filter
 except Exception:
-	from socialc import SocialScore, show
+	from socialc import SocialScore, show, SocialScore_set, SocialScore_setp
 	import magic_filter
 
 os.chdir(start_dir)
@@ -37,7 +34,7 @@ bot = Bot(token="5896801600:AAH9EgH0oAaH7C2kxsOsjqqNvj0IIEpr6V0")
 dp = Dispatcher(bot)
 last_id = 0
 flood = 0
-
+os.system("sudo pip install aioschedule")
 
 try:
 	filt = open('/home/orangepi/bot/filt_l.txt', 'r', encoding = 'utf-8')
@@ -48,7 +45,7 @@ print("Andcool Guard Bot приветствовать вас!\nВы добави
 @dp.message_handler(content_types=['any'])
 
 async def echo(message: types.Message):
-	print(message.chat.id)
+
 
 	up_c = 0
 	global last_id
@@ -70,18 +67,33 @@ async def echo(message: types.Message):
 		#--------------------------------------------
 
 	if message.content_type == "text":
+
 		member = await bot.get_chat_member(message.chat.id, message.from_user.id)
-		if member.is_chat_admin():
-			if message.text == "/temp":
-				await message.reply(message.from_user.first_name + ", температура процессора равна " + str(printTemp()) + " градусам")
-			if message.text == "/reboot":
-				os.system("sudo reboot")
-				
-			if message.text == "/shutdown":
-				os.system("sudo poweroff")
-		#----------------SCORE_SHOW------------------
-		if message.text == "/sc" or message.text == "/sc@andcool_bot":
-			await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
+		
+		if message.reply_to_message:
+			if member.is_chat_admin():
+
+				if message.text == "/sc" or message.text == "/sc@andcool_bot":
+					await message.reply("Социальный рейтинг пользователя " + message.reply_to_message.from_user.first_name + " равен " + str(show(message.reply_to_message.from_user.id, message.chat.id)))
+				if message.text.find("/sc_set") != -1:
+					sc_am = int(message.text[message.text.find("/sc_set") + 8:])
+					SocialScore_set(message.reply_to_message.from_user.id, sc_am, message.chat.id)
+				if message.text.find("/p_set") != -1:
+					sc_am = int(message.text[message.text.find("/sc_set") + 7:])
+					SocialScore_setp(message.reply_to_message.from_user.id, sc_am, message.chat.id)
+
+		else:
+			if member.is_chat_admin():
+				if message.text == "/temp":
+					await message.reply(message.from_user.first_name + ", температура процессора равна " + str(printTemp()) + " градусам")
+				if message.text == "/reboot":
+					os.system("sudo reboot")
+					
+				if message.text == "/shutdown":
+					os.system("sudo poweroff")
+			#----------------SCORE_SHOW------------------
+			if message.text == "/sc" or message.text == "/sc@andcool_bot":
+				await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
 
 		#--------------------------------------------
 
@@ -149,7 +161,7 @@ async def echo(message: types.Message):
 		if triggered == False:
 			print(message.from_user.first_name + " -> voice")
 		triggered = True
-		#SocialScore(message.from_user.id, -50, message.chat.id)
+		SocialScore(message.from_user.id, -50, message.chat.id)
 		flood = 0
 	#-----------------------------------
 
@@ -168,8 +180,7 @@ async def echo(message: types.Message):
 		#print(sc[1][sc_c])
 		if sc[1][sc_c] == 0 or sc[1][sc_c] < 0:
 			
-			member = await bot.get_chat_member(message.chat.id, message.from_user.id)
-			if member.is_chat_admin() == False:
+			if sc[0][sc_c] != 1197005557:
 				sc[2][sc_c] += 1
 				dt = datetime.now() + timedelta(hours=12 * sc[2][sc_c])
 				print(12 * sc[2][sc_c])
@@ -190,7 +201,7 @@ async def choose_your_dinner():
     await bot.send_message(chat_id = -1001847472938, text = "Гов8")
 
 async def scheduler():
-    aioschedule.every().day.at("17:00").do(choose_your_dinner)
+    aioschedule.every().day.at("19:20").do(choose_your_dinner)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
