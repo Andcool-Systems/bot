@@ -149,7 +149,7 @@ async def echo(message: types.Message):
 		if triggered == False:
 			print(message.from_user.first_name + " -> voice")
 		triggered = True
-		SocialScore(message.from_user.id, -50, message.chat.id)
+		#SocialScore(message.from_user.id, -50, message.chat.id)
 		flood = 0
 	#-----------------------------------
 
