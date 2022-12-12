@@ -76,8 +76,7 @@ async def echo(message: types.Message):
 			member = await bot.get_chat_member(message.chat.id, message.from_user.id)
 			
 		#----------------SCORE_SHOW------------------
-			if message.text == "/sc" or message.text == "/sc@andcool_bot":
-				await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
+
 
 			if message.reply_to_message:
 				if member.is_chat_admin():
@@ -234,4 +233,3 @@ async def on_startup(dp):
     asyncio.create_task(scheduler())
 if __name__ == "__main__":
 	executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
-
