@@ -98,9 +98,9 @@ async def echo(message: types.Message):
 						os.system("sudo reboot")
 					if message.text == "/shutdown":
 						os.system("sudo poweroff")
-			#----------------SCORE_SHOW------------------
-			if message.text == "/sc" or message.text == "/sc@andcool_bot":
-				await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
+				#----------------SCORE_SHOW------------------
+				if message.text == "/sc" or message.text == "/sc@andcool_bot":
+					await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
 			#--------------------------------------------
 
 			#----------------CAPS_GUARD------------------
