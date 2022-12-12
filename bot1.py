@@ -22,10 +22,10 @@ import aioschedule
 start_dir = os.getcwd()
 try:
 	os.chdir(sys._MEIPASS)
-	from socialc import SocialScore, show
+	from socialc import SocialScore, show, SocialScore_set, SocialScore_setp
 	import magic_filter
 except Exception:
-	from socialc import SocialScore, show
+	from socialc import SocialScore, show, SocialScore_set, SocialScore_setp
 	import magic_filter
 
 os.chdir(start_dir)
@@ -74,18 +74,34 @@ async def echo(message: types.Message):
 
 		if message.content_type == "text":
 			member = await bot.get_chat_member(message.chat.id, message.from_user.id)
-			if member.is_chat_admin():
-				if message.text == "/temp":
-					await message.reply(message.from_user.first_name + ", температура процессора равна " + str(printTemp()) + " градусам")
-				if message.text == "/reboot":
-					os.system("sudo reboot")
-					
-				if message.text == "/shutdown":
-					os.system("sudo poweroff")
-			#----------------SCORE_SHOW------------------
+			
+		#----------------SCORE_SHOW------------------
 			if message.text == "/sc" or message.text == "/sc@andcool_bot":
 				await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
 
+			if message.reply_to_message:
+				if member.is_chat_admin():
+
+					if message.text == "/sc" or message.text == "/sc@andcool_bot":
+						await message.reply("Социальный рейтинг пользователя " + message.reply_to_message.from_user.first_name + " равен " + str(show(message.reply_to_message.from_user.id, message.chat.id)))
+					if message.text.find("/sc_set") != -1:
+						sc_am = int(message.text[message.text.find("/sc_set") + 8:])
+						SocialScore_set(message.reply_to_message.from_user.id, sc_am, message.chat.id)
+					if message.text.find("/p_set") != -1:
+						sc_am = int(message.text[message.text.find("/sc_set") + 7:])
+						SocialScore_setp(message.reply_to_message.from_user.id, sc_am, message.chat.id)
+
+			else:
+				if message.from_user.id == 1197005557:
+					if message.text == "/temp":
+						await message.reply(message.from_user.first_name + ", температура процессора равна " + str(printTemp()) + " градусам")
+					if message.text == "/reboot":
+						os.system("sudo reboot")
+					if message.text == "/shutdown":
+						os.system("sudo poweroff")
+			#----------------SCORE_SHOW------------------
+			if message.text == "/sc" or message.text == "/sc@andcool_bot":
+				await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
 			#--------------------------------------------
 
 			#----------------CAPS_GUARD------------------
