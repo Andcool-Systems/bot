@@ -1,5 +1,6 @@
 polit = "путин", "байден", "зеленский", "спецопераци", "войн", "путя", "байдэн"
 nah = "кринж", "боже", "бож", "чел"
+link = "https://www.youtube.com", "https://www.youtube.ru", "https://vk.com", "https://github.com", "https://aliexpress.ru", "https://www.thingiverse.com"
 import logging
 from datetime import datetime, date, time, timedelta
 from aiogram import Bot, Dispatcher, executor, types
@@ -104,7 +105,20 @@ async def echo(message: types.Message):
 		#--------------------------------------------
 
 		mess = message.text.lower()
+		#--------------------------------------------
+		finded_link = False
+		for i in range(len(link)):
+			print(mess.find(link[i]))
+			if mess.find(link[i]) != -1:
+				finded_link = True
+			if "https://" in mess and not finded_link:
+				await message.answer("Партия запрещать присылать незнакомые ссылки! \nСоциальный рейтинг понижен на 50.")
+				await message.delete()
+				SocialScore(message.from_user.id, -50, message.chat.id)
+				break
 
+		finded_link = False
+		#--------------------------------------------
 		#----------------FILT------------------------
 		for i in range(len(filt_s)):
 			if mess.find(filt_s[i].lower()) != -1:
