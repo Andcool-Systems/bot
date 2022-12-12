@@ -49,8 +49,10 @@ print("Andcool Guard Bot приветствовать вас!\nВы добави
 @dp.message_handler(content_types=['any'])
 
 async def echo(message: types.Message):
-	if message.chat.id != 1197005557:
-
+	print(message)
+	if message.chat.type != "private":
+		if message.from_user.is_bot == True:
+			await message.delete()
 		up_c = 0
 		global last_id
 		global flood
@@ -196,7 +198,7 @@ async def echo(message: types.Message):
 				np.save("SocialScore" + str(message.chat.id) +".npy", sc)
 	else:
 		txt = "Andcool Guard Bot приветствовать вас!\nВы добавить меня в группа и сделать админ.\nЯ навести там порядок!\n" + "Раздаю муты за:\n- Обсуждение политики\n- Нецензурные выражения\n- Сообщения капсом\n- Флуд (куча сообщений подряд)\n\n" + "Команды для админов (ответь на сообщение цели):\n/sc - социальный рейтинг пользователя\n/sc_set - установка социального рейтинга для пользователя\n/p_set - установка степени наказания для пользователя\n" + "/temp - температура процессора на сервере\n/reboot - перезапуск сервера\n/shutdown - выключение сервера"
-		await bot.send_message(chat_id = 1197005557, text = txt)
+		await bot.send_message(chat_id = message.from_user.id, text = txt)
 
 	#------------------------------------------------------------------------------
 
