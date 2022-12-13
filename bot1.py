@@ -89,7 +89,7 @@ async def echo(message: types.Message):
 						sc_am = int(message.text[message.text.find("/sc_set") + 7:])
 						SocialScore_setp(message.reply_to_message.from_user.id, sc_am, message.chat.id)
 					if message.text.find("/mute") != -1:
-						mute_t = int(message.text[message.text.find("/mute") + 6:])
+						mute_t = float(message.text[message.text.find("/mute") + 6:])
 						dt = datetime.now() + timedelta(hours=mute_t)
 						timestamp = dt.timestamp()
 						flood = 0
