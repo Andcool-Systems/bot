@@ -51,8 +51,7 @@ print("Andcool Guard Bot приветствовать вас!\nВы добави
 async def echo(message: types.Message):
 	print(message)
 	if message.chat.type != "private":
-		if message.from_user.is_bot == True:
-			await message.delete()
+
 		up_c = 0
 		global last_id
 		global flood
@@ -89,6 +88,16 @@ async def echo(message: types.Message):
 					if message.text.find("/p_set") != -1:
 						sc_am = int(message.text[message.text.find("/sc_set") + 7:])
 						SocialScore_setp(message.reply_to_message.from_user.id, sc_am, message.chat.id)
+					if message.text.find("/mute") != -1:
+						mute_t = int(message.text[message.text.find("/mute") + 6:])
+						dt = datetime.now() + timedelta(hours=mute_t)
+						timestamp = dt.timestamp()
+						flood = 0
+						await message.delete()
+						await bot.restrict_chat_member(message.chat.id, message.reply_to_message.from_user.id, types.ChatPermissions(False), until_date = timestamp)
+					if message.text.find("/ban") != -1:
+						await message.delete()
+						await bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id, revoke_messages=False)
 
 			else:
 				if message.from_user.id == 1197005557:
