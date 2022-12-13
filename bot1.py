@@ -82,7 +82,7 @@ async def echo(message: types.Message):
 				if member.is_chat_admin():
 
 					if message.text == "/sc" or message.text == "/sc@andcool_bot":
-						await message.reply("Социальный рейтинг пользователя " + message.reply_to_message.from_user.first_name + " равен " + str(show(message.reply_to_message.from_user.id, message.chat.id)))
+						await message.reply("Социальный рейтинг пользователя " + message.reply_to_message.from_user.first_name + " равен " + str(int(show(message.reply_to_message.from_user.id, message.chat.id))))
 					if message.text.find("/sc_set") != -1:
 						sc_am = int(message.text[message.text.find("/sc_set") + 8:])
 						SocialScore_set(message.reply_to_message.from_user.id, sc_am, message.chat.id)
@@ -100,7 +100,7 @@ async def echo(message: types.Message):
 						os.system("sudo poweroff")
 				#----------------SCORE_SHOW------------------
 				if message.text == "/sc" or message.text == "/sc@andcool_bot":
-					await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
+					await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(int(show(message.from_user.id, message.chat.id))))
 			#--------------------------------------------
 
 			#----------------CAPS_GUARD------------------
