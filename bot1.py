@@ -49,7 +49,8 @@ print("Andcool Guard Bot приветствовать вас!\nВы добави
 @dp.message_handler(content_types=['any'])
 
 async def echo(message: types.Message):
-	print(message)
+
+
 	if message.chat.type != "private":
 
 		up_c = 0
@@ -122,7 +123,6 @@ async def echo(message: types.Message):
 			#--------------------------------------------
 			finded_link = False
 			for i in range(len(link)):
-				print(mess.find(link[i]))
 				if mess.find(link[i]) != -1:
 					finded_link = True
 				if "https://" in mess and not finded_link:
@@ -134,52 +134,55 @@ async def echo(message: types.Message):
 			finded_link = False
 			#--------------------------------------------
 			#----------------FILT------------------------
-			for i in range(len(filt_s)):
-				if mess.find(filt_s[i].lower()) != -1:
-					answers1 = message.from_user.first_name + ", молчать!\n" + "Мат и оскорбления запрещать в этом чате!\n" + "Социальный рейтинг понижен на 100.", "Партия не поддерживать такие выражения!\nСоциальный рейтинг понижен на 100."
-					await message.answer(answers1[random.randint(0, 1)])
-					await message.delete()
-					SocialScore(message.from_user.id, -100, message.chat.id)
-					dt = datetime.now() + timedelta(minutes=15)
-					timestamp = dt.timestamp()
+			try:
+				for i in range(len(filt_s)):
+					if mess.find(filt_s[i].lower()) != -1:
+						answers1 = message.from_user.first_name + ", молчать!\n" + "Мат и оскорбления запрещать в этом чате!\n" + "Социальный рейтинг понижен на 100.", "Партия не поддерживать такие выражения!\nСоциальный рейтинг понижен на 100."
+						await message.answer(answers1[random.randint(0, 1)])
+						await message.delete()
+						SocialScore(message.from_user.id, -100, message.chat.id)
+						dt = datetime.now() + timedelta(minutes=15)
+						timestamp = dt.timestamp()
+						flood = 0
+						#await bot.restrict_chat_member(message.chat.id, message.from_user.id, types.ChatPermissions(False), until_date = timestamp)
+						if triggered == False:
+							print(message.from_user.first_name + ', ' + message.text + " -> swearing")
+						triggered = True
+						break
+				#-------------------------------------------
+
+				#---------------POLIT-----------------------
+				for i in range(len(polit)):
+					if mess.find(polit[i].lower()) != -1:
+						await message.answer("Партия запрещать обсуждать политика в этом чате!\nСоциальный рейтинг понижен на 120.")
+						await message.delete()
+						SocialScore(message.from_user.id, -120, message.chat.id)
+						if triggered == False:
+							print(message.from_user.first_name + ', ' + message.text + " -> polit")
+						triggered = True
+						break
+				for i in range(len(nah)):
+					if mess.find(nah[i].lower()) != -1:
+						await message.answer("Партия приказывать говорить правильно!\nСоциальный рейтинг понижен на 50.")
+						await message.delete()
+						SocialScore(message.from_user.id, -50, message.chat.id)
+						if triggered == False:
+							print(message.from_user.first_name + ', ' + message.text + " -> nah")
+						triggered = True
+						break
+				#-------------------------------------------
+
+				#-------------CAPS_GUARD--------------------
+				if(up_c * 100) / len(message.text) >= 50 and len(message.text) >= 4:
+					await message.reply("Партия понимать вас без капса!\n" + "Социальный рейтинг понижен на 10.")
+					if triggered == False:
+						print(message.from_user.first_name + ', ' + message.text + " -> CAPS")
+					triggered = True
+					SocialScore(message.from_user.id, -10, message.chat.id)
 					flood = 0
-					#await bot.restrict_chat_member(message.chat.id, message.from_user.id, types.ChatPermissions(False), until_date = timestamp)
-					if triggered == False:
-						print(message.from_user.first_name + ', ' + message.text + " -> swearing")
-					triggered = True
-					break
-			#-------------------------------------------
-
-			#---------------POLIT-----------------------
-			for i in range(len(polit)):
-				if mess.find(polit[i].lower()) != -1:
-					await message.answer("Партия запрещать обсуждать политика в этом чате!\nСоциальный рейтинг понижен на 120.")
-					await message.delete()
-					SocialScore(message.from_user.id, -120, message.chat.id)
-					if triggered == False:
-						print(message.from_user.first_name + ', ' + message.text + " -> polit")
-					triggered = True
-					break
-			for i in range(len(nah)):
-				if mess.find(nah[i].lower()) != -1:
-					await message.answer("Партия приказывать говорить правильно!\nСоциальный рейтинг понижен на 50.")
-					await message.delete()
-					SocialScore(message.from_user.id, -50, message.chat.id)
-					if triggered == False:
-						print(message.from_user.first_name + ', ' + message.text + " -> nah")
-					triggered = True
-					break
-			#-------------------------------------------
-
-			#-------------CAPS_GUARD--------------------
-			if(up_c * 100) / len(message.text) >= 50 and len(message.text) >= 4:
-				await message.reply("Партия понимать вас без капса!\n" + "Социальный рейтинг понижен на 10.")
-				if triggered == False:
-					print(message.from_user.first_name + ', ' + message.text + " -> CAPS")
-				triggered = True
-				SocialScore(message.from_user.id, -10, message.chat.id)
-				flood = 0
-			#-------------------------------------------
+				#-------------------------------------------
+			except Exception:
+				pass
 
 		#---------------VOICE----------------
 		elif message.content_type == "voice":
@@ -189,7 +192,7 @@ async def echo(message: types.Message):
 			if triggered == False:
 				print(message.from_user.first_name + " -> voice")
 			triggered = True
-			SocialScore(message.from_user.id, -50, message.chat.id)
+			#SocialScore(message.from_user.id, -50, message.chat.id)
 			flood = 0
 		#-----------------------------------
 
@@ -208,13 +211,14 @@ async def echo(message: types.Message):
 			#print(sc[1][sc_c])
 			if sc[1][sc_c] == 0 or sc[1][sc_c] < 0:
 				mutted = False
-				member = await bot.get_chat_member(message.chat.id, message.from_user.id)
-				if member.is_chat_admin() == False and message.from_user.id == sc[0][sc_c]:
+				member = await bot.get_chat_member(message.chat.id, sc[0][sc_c])
+				print(member.user.first_name)
+				if member.status == "member" or member.status == "restricted":
 					sc[2][sc_c] += 1
 					dt = datetime.now() + timedelta(hours=12 * sc[2][sc_c])
-					print(12 * sc[2][sc_c])
+
 					timestamp = dt.timestamp()
-					await message.answer(message.from_user.first_name + "\nВы себя плохо вести!\n" + "Мут на " + str(round(12 * sc[2][sc_c])) + " часа!\n")
+					await message.answer(member.user.first_name + "!\nВы себя плохо вести!\n" + "Мут на " + str(round(12 * sc[2][sc_c])) + " часа!\n")
 					mutted = await bot.restrict_chat_member(message.chat.id, sc[0][sc_c], types.ChatPermissions(False), until_date = timestamp)
 					
 				
@@ -241,4 +245,4 @@ async def scheduler():
 async def on_startup(dp): 
     asyncio.create_task(scheduler())
 if __name__ == "__main__":
-	executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+	executor.start_polling(dp, skip_updates=False, on_startup=on_startup)
