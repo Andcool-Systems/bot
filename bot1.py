@@ -81,7 +81,7 @@ async def echo(message: types.Message):
 				if member.is_chat_admin():
 
 					if message.text == "/sc" or message.text == "/sc@andcool_bot":
-						await message.reply("Социальный рейтинг пользователя " + message.reply_to_message.from_user.first_name + " равен " + str(show(message.reply_to_message.from_user.id, message.chat.id)))
+						await message.reply("Социальный рейтинг пользователя " + message.reply_to_message.from_user.first_name + " равен " + str(int(show(message.reply_to_message.from_user.id, message.chat.id))))
 					if message.text.find("/sc_set") != -1:
 						sc_am = int(message.text[message.text.find("/sc_set") + 8:])
 						SocialScore_set(message.reply_to_message.from_user.id, sc_am, message.chat.id)
@@ -109,7 +109,7 @@ async def echo(message: types.Message):
 						os.system("sudo poweroff")
 				#----------------SCORE_SHOW------------------
 				if message.text == "/sc" or message.text == "/sc@andcool_bot":
-					await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
+					await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(int(show(message.from_user.id, message.chat.id))))
 			#--------------------------------------------
 
 			#----------------CAPS_GUARD------------------
@@ -207,7 +207,7 @@ async def echo(message: types.Message):
 		for sc_c in range(99):
 			#print(sc[1][sc_c])
 			if sc[1][sc_c] == 0 or sc[1][sc_c] < 0:
-				
+				mutted = False
 				member = await bot.get_chat_member(message.chat.id, message.from_user.id)
 				if member.is_chat_admin() == False:
 					sc[2][sc_c] += 1
@@ -215,10 +215,10 @@ async def echo(message: types.Message):
 					print(12 * sc[2][sc_c])
 					timestamp = dt.timestamp()
 					await message.answer(message.from_user.first_name + "\nВы себя плохо вести!\n" + "Мут на " + str(round(12 * sc[2][sc_c])) + " часа!\n")
-					await bot.restrict_chat_member(message.chat.id, sc[0][sc_c], types.ChatPermissions(False), until_date = timestamp)
+					mutted = await bot.restrict_chat_member(message.chat.id, sc[0][sc_c], types.ChatPermissions(False), until_date = timestamp)
 					
-
-				sc[1][sc_c] = 300
+				if mutted == True:
+					sc[1][sc_c] = 300
 				np.save("SocialScore" + str(message.chat.id) +".npy", sc)
 	else:
 		txt = "Andcool Guard Bot приветствовать вас!\nВы добавить меня в группа и сделать админ.\nЯ навести там порядок!\n" + "Раздаю муты за:\n- Обсуждение политики\n- Нецензурные выражения\n- Сообщения капсом\n- Флуд (куча сообщений подряд)\n\n" + "Команды для админов (ответь на сообщение цели):\n/sc - социальный рейтинг пользователя\n/sc_set - установка социального рейтинга для пользователя\n/p_set - установка степени наказания для пользователя\n"
