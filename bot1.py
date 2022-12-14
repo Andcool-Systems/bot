@@ -126,9 +126,9 @@ async def echo(message: types.Message):
 								await message.reply(message.from_user.first_name + " поставил " + str(sc_rl) + " социального рейтинга и проиграл!\n-" + str(sc_rl) + " социального рейтинга")
 								SocialScore(message.from_user.id, sc_rl * -1, message.chat.id)
 						else:
-							await message.reply("Введите число от 1 до " + str(show(message.from_user.id, message.chat.id)))
+							await message.reply("Введите число от 1 до " + str(show(message.from_user.id, message.chat.id)) + "\nПример: /sc_roulette " + str(random.randint(1, sc_n)))
 					except Exception:
-						await message.reply("Введите число от 1 до " + str(show(message.from_user.id, message.chat.id)))
+						await message.reply("Введите число от 1 до " + str(show(message.from_user.id, message.chat.id)) + "\nПример: /sc_roulette " + str(random.randint(1, sc_n)))
 
 			#--------------------------------------------
 
