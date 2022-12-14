@@ -13,7 +13,7 @@ import fan
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
-time.sleep(10)
+#time.sleep(10)
 import asyncio
 import aioschedule
 
@@ -111,6 +111,25 @@ async def echo(message: types.Message):
 				#----------------SCORE_SHOW------------------
 				if message.text == "/sc" or message.text == "/sc@andcool_bot":
 					await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
+				if message.text.find("/sc_roulette") != -1:
+					try:
+
+						sc_n = show(message.from_user.id, message.chat.id)
+						sc_rl = int(message.text[message.text.find("/sc_roulette") + 13:])
+						print(type(sc_n))
+						if sc_rl > 1 and sc_rl <= sc_n:
+							rand_sc = random.randint(0, 5)
+							if rand_sc == 2:
+								await message.reply(message.from_user.first_name + " поставил " + str(sc_rl) + " социального рейтинга и выиграл!\n+" + str(sc_rl) + " социального рейтинга")
+								SocialScore(message.from_user.id, sc_rl, message.chat.id)
+							else:
+								await message.reply(message.from_user.first_name + " поставил " + str(sc_rl) + " социального рейтинга и проиграл!\n-" + str(sc_rl) + " социального рейтинга")
+								SocialScore(message.from_user.id, sc_rl * -1, message.chat.id)
+						else:
+							await message.reply("Введите число от 1 до " + str(show(message.from_user.id, message.chat.id)))
+					except Exception:
+						await message.reply("Введите число от 1 до " + str(show(message.from_user.id, message.chat.id)))
+
 			#--------------------------------------------
 
 			#----------------CAPS_GUARD------------------
