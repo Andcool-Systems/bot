@@ -115,7 +115,11 @@ async def echo(message: types.Message):
 					try:
 
 						sc_n = show(message.from_user.id, message.chat.id)
-						sc_rl = int(message.text[message.text.find("/sc_roulette") + 13:])
+						sc_tx = message.text[message.text.find("/sc_roulette") + 13:]
+						if sc_tx.find("all") != -1:
+							sc_rl = sc_n
+						else:
+							sc_rl = int(sc_tx)
 						print(type(sc_n))
 						if sc_rl > 1 and sc_rl <= sc_n:
 							rand_sc = random.randint(0, 5)
