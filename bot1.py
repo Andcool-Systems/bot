@@ -209,7 +209,7 @@ async def echo(message: types.Message):
 			if sc[1][sc_c] == 0 or sc[1][sc_c] < 0:
 				mutted = False
 				member = await bot.get_chat_member(message.chat.id, message.from_user.id)
-				if member.is_chat_admin() == False:
+				if member.is_chat_admin() == False and message.from_user.id == sc[0][sc_c]:
 					sc[2][sc_c] += 1
 					dt = datetime.now() + timedelta(hours=12 * sc[2][sc_c])
 					print(12 * sc[2][sc_c])
@@ -217,8 +217,8 @@ async def echo(message: types.Message):
 					await message.answer(message.from_user.first_name + "\nВы себя плохо вести!\n" + "Мут на " + str(round(12 * sc[2][sc_c])) + " часа!\n")
 					mutted = await bot.restrict_chat_member(message.chat.id, sc[0][sc_c], types.ChatPermissions(False), until_date = timestamp)
 					
-				if mutted == True:
-					sc[1][sc_c] = 300
+				
+				sc[1][sc_c] = 300
 				np.save("SocialScore" + str(message.chat.id) +".npy", sc)
 	else:
 		txt = "Andcool Guard Bot приветствовать вас!\nВы добавить меня в группа и сделать админ.\nЯ навести там порядок!\n" + "Раздаю муты за:\n- Обсуждение политики\n- Нецензурные выражения\n- Сообщения капсом\n- Флуд (куча сообщений подряд)\n\n" + "Команды для админов (ответь на сообщение цели):\n/sc - социальный рейтинг пользователя\n/sc_set - установка социального рейтинга для пользователя\n/p_set - установка степени наказания для пользователя\n"
