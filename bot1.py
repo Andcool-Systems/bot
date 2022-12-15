@@ -13,7 +13,7 @@ import fan
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
-#time.sleep(10)
+time.sleep(10)
 import asyncio
 import aioschedule
 
@@ -121,7 +121,7 @@ async def echo(message: types.Message):
 						else:
 							sc_rl = int(sc_tx)
 						print(type(sc_n))
-						if sc_rl > 1 and sc_rl <= sc_n:
+						if sc_rl >= 1 and sc_rl <= sc_n:
 							rand_sc = random.randint(0, 5)
 							if rand_sc == 2:
 								await message.reply(message.from_user.first_name + " поставил " + str(sc_rl) + " социального рейтинга и выиграл!\n+" + str(sc_rl) + " социального рейтинга")
