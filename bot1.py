@@ -1,5 +1,5 @@
 polit = "путин", "байден", "зеленский", "спецопераци", "войн", "путя", "байдэн"
-nah = "кринж ", "боже ", "бож ", "чел "
+nah = " кринж ", " боже ", " бож ", " чел "
 link = "https://www.youtube.com", "https://www.youtube.ru", "https://vk.com", "https://github.com", "https://aliexpress.ru", "https://www.thingiverse.com"
 import logging
 from datetime import datetime, date, time, timedelta
@@ -245,7 +245,7 @@ async def echo(message: types.Message):
 			if sc[1][sc_c] == 0 or sc[1][sc_c] < 0:
 				mutted = False
 				member = await bot.get_chat_member(message.chat.id, sc[0][sc_c])
-				print(member.user.first_name)
+				print(member)
 				if member.status == "member" or member.status == "restricted":
 					sc[2][sc_c] += 1
 					dt = datetime.now() + timedelta(hours=12 * sc[2][sc_c])
@@ -258,8 +258,11 @@ async def echo(message: types.Message):
 				sc[1][sc_c] = 300
 				np.save("SocialScore" + str(message.chat.id) +".npy", sc)
 	else:
-		txt = "Andcool Guard Bot приветствовать вас!\nВы добавить меня в группа и сделать админ.\nЯ навести там порядок!\n" + "Раздаю муты за:\n- Обсуждение политики\n- Нецензурные выражения\n- Сообщения капсом\n- Флуд (куча сообщений подряд)\n\n" + "Команды для админов (ответь на сообщение цели):\n/sc - социальный рейтинг пользователя\n/sc_set - установка социального рейтинга для пользователя\n/p_set - установка степени наказания для пользователя\n/ban - выгнать участника\n/mute 1 - замутить участника на 1 час"
-		await bot.send_message(chat_id = message.from_user.id, text = txt)
+		
+		txt = "Andcool Guard Bot приветствовать вас!\nВы добавить меня в группа и сделать админ.\nЯ навести там порядок!\n" + "Раздаю муты за:\n- Обсуждение политики\n- Нецензурные выражения\n- Сообщения капсом\n- Флуд (куча сообщений подряд)\n\n"
+		txt1 = "Команды для админов (ответь на сообщение цели):\n/sc - социальный рейтинг пользователя\n/sc_set - установка социального рейтинга для пользователя\n/p_set - установка степени наказания для пользователя\n/ban - выгнать участника\n/mute 1 - замутить участника на 1 час\n"
+		txt2 = "\nБелый список - привилегия, на необработку сообщений ботом\nКоманды белого списка (ответь на сообщение цели):\n/white_list_add - добавить участника в белый список\n/white_list_remove - удалить пользователя из белого списка"
+		await bot.send_message(chat_id = message.from_user.id, text = txt + txt1 + txt2)
 
 	#------------------------------------------------------------------------------
 
