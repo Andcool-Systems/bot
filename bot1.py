@@ -127,7 +127,7 @@ async def echo(message: types.Message):
 						sc_n = show(message.from_user.id, message.chat.id)
 						sc_tx = message.text[message.text.find("/sc_roulette") + 13:]
 						if sc_tx.find("all") != -1:
-							sc_rl = sc_n
+							sc_rl = sc_n - 1
 						else:
 							sc_rl = int(sc_tx)
 						print(type(sc_n))
