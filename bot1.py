@@ -1,5 +1,5 @@
 polit = "путин", "байден", "зеленский", "спецопераци", "войн", "путя", "байдэн"
-nah = "кринж", "боже", "бож", "чел"
+nah = " кринж ", " боже ", " бож ", " чел "
 link = "https://www.youtube.com", "https://www.youtube.ru", "https://vk.com", "https://github.com", "https://aliexpress.ru", "https://www.thingiverse.com"
 import logging
 from datetime import datetime, date, time, timedelta
