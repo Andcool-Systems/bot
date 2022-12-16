@@ -270,7 +270,7 @@ async def echo(message: types.Message):
 @dp.message_handler()
 async def choose_your_dinner():
     
-    await bot.send_message(chat_id = -1001847472938, text = "Гов8")
+    await bot.send_message(chat_id = -1001503382884, text = "Гов8")
 
 async def scheduler():
     aioschedule.every().day.at("17:00").do(choose_your_dinner)
