@@ -281,4 +281,15 @@ async def scheduler():
 async def on_startup(dp): 
     asyncio.create_task(scheduler())
 if __name__ == "__main__":
-	executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+	started = True
+	while started:
+		try:
+			executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+			started = False
+		except Exception:
+			started = True
+			print("An error has occurred, reboot in 10 seconds")
+			time.sleep(10)
+			print("rebooting...")
+
+
