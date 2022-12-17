@@ -1,5 +1,5 @@
 polit = "путин", "байден", "зеленский", "спецопераци", "войн", "путя", "байдэн"
-nah = "кринж", "боже", "бож", "кринг"
+nah = " кринж ", " боже ", " бож ", " чел "
 link = "https://www.youtube.com", "https://www.youtube.ru", "https://vk.com", "https://github.com", "https://aliexpress.ru", "https://www.thingiverse.com"
 import logging
 from datetime import datetime, date, time, timedelta
@@ -17,7 +17,9 @@ import white_list
 #time.sleep(10)
 import asyncio
 import aioschedule
-
+from aiogram.utils.exceptions import (MessageToEditNotFound, MessageCantBeEdited, MessageCantBeDeleted,
+                                      MessageToDeleteNotFound)
+from contextlib import suppress
 
 
 start_dir = os.getcwd()
@@ -47,6 +49,13 @@ except Exception:
 	filt = open('filt_l.txt', 'r', encoding = 'utf-8')
 filt_s = filt.read().split("/")
 print("Andcool Guard Bot приветствовать вас!\nВы добавить меня в группа и сделать админ.\nЯ навести там порядок!")
+
+async def delete_message(message: types.Message, sleep_time: int = 0):
+    await asyncio.sleep(sleep_time)
+    with suppress(MessageCantBeDeleted, MessageToDeleteNotFound):
+        await message.delete()
+
+
 @dp.message_handler(content_types=['any'])
 
 async def echo(message: types.Message):
@@ -120,7 +129,9 @@ async def echo(message: types.Message):
 						os.system("sudo poweroff")
 				#----------------SCORE_SHOW------------------
 				if message.text == "/sc" or message.text == "/sc@andcool_bot":
-					await message.reply(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
+					await message.delete()
+					msg = await message.answer(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
+					asyncio.create_task(delete_message(msg, 60))
 				if message.text.find("/sc_roulette") != -1:
 					try:
 
