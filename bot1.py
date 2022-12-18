@@ -122,8 +122,7 @@ async def echo(message: types.Message):
 
 			else:
 				if message.from_user.id == 1197005557:
-					if message.text == "/temp":
-						await message.reply(message.from_user.first_name + ", температура процессора равна " + str(printTemp()) + " градусам")
+					
 					if message.text == "/reboot":
 						os.system("sudo reboot")
 					if message.text == "/shutdown":
