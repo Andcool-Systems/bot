@@ -13,8 +13,7 @@ def readTemp():
         file.close()
         return(temp)
     except:
-        print("Unsupported device")
-        exit()
+
 
 def convertTemp(temp):
     if temp > 200:
