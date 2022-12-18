@@ -60,7 +60,8 @@ async def delete_message(message: types.Message, sleep_time: int = 0):
 
 async def echo(message: types.Message):
 
-
+	if message.chat.id == -1001647677200:
+		await message.delete()
 	if message.chat.type != "private":
 
 		up_c = 0
@@ -280,11 +281,17 @@ async def echo(message: types.Message):
 
 @dp.message_handler()
 async def choose_your_dinner():
-    
-    await bot.send_message(chat_id = -1001503382884, text = "Гов8")
+    try:
+    	await bot.edit_message_text(chat_id = -1001647677200, message_id = 3, text = f"Температура {printTemp()}")
+    except Exception:
+    	pass
+
+    #msg1 = await bot.send_message(chat_id = -1001647677200, text = "Гов8")
+    #print(msg1)
+
 
 async def scheduler():
-    aioschedule.every().day.at("17:00").do(choose_your_dinner)
+    aioschedule.every(5).seconds.do(choose_your_dinner)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
