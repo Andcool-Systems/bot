@@ -35,10 +35,10 @@ def start():
         if (time.time() - last_time) * 1000 > 1500:
             last_time = time.time()
             
-            if temp1 <= 50:
+            if temp1 <= 55:
                 pwm_deg = 0
                 digitalWrite(228, 0)
-            if temp1 > 55:
+            if temp1 > 60:
                 pwm_deg = 100
                 digitalWrite(228, 1)
             """
