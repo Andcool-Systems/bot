@@ -12,7 +12,8 @@ def readTemp():
         temp = int(file.read().replace("\n", ""))
         file.close()
         return(temp)
-    except:
+    except Exception:
+        pass
 
 
 def convertTemp(temp):
