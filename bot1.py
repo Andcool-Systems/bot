@@ -13,6 +13,7 @@ import fan
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 import white_list
+import top
 
 #time.sleep(10)
 import asyncio
@@ -59,7 +60,8 @@ async def delete_message(message: types.Message, sleep_time: int = 0):
 @dp.message_handler(content_types=['any'])
 
 async def echo(message: types.Message):
-
+	top.add(message.from_user.id, message.chat.id)
+	
 	if message.chat.id == -1001647677200:
 		await message.delete()
 	if message.chat.type != "private":
@@ -132,6 +134,13 @@ async def echo(message: types.Message):
 					await message.delete()
 					msg = await message.answer(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
 					asyncio.create_task(delete_message(msg, 60))
+				if message.text == "/top":
+					topl, count = top.sort(message.chat.id)
+					text = "Топ пользователей по количеству сообщений:\n"
+					for x_top in range(count):
+						member = await bot.get_chat_member(message.chat.id, round(topl[x_top][0]))
+						text = text + f"{x_top + 1}. {member.user.first_name} - {round(topl[x_top][1])}\n"
+					await message.reply(text)	
 				if message.text.find("/sc_roulette") != -1:
 					try:
 
