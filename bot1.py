@@ -46,7 +46,7 @@ flood = 0
 
 try:
 	filt = open('/home/orangepi/bot/bot/filt_l.txt', 'r', encoding = 'utf-8')
-	os.system("cd")
+	os.system("cd /home/orangepi")
 except Exception:
 	filt = open('filt_l.txt', 'r', encoding = 'utf-8')
 filt_s = filt.read().split("/")
