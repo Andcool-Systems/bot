@@ -25,7 +25,7 @@ from aiogram.utils.exceptions import (MessageToEditNotFound, MessageCantBeEdited
                                       MessageToDeleteNotFound)
 from contextlib import suppress
 
-print(os.getcwd())
+
 
 
 from socialc import SocialScore, show, SocialScore_set, SocialScore_setp #Модуль для работы с социальным рейтингом пользователей (самописный)
