@@ -158,7 +158,7 @@ async def echo(message: types.Message): # главная функция
 
 				# Отображение топа пользователей по кол-ву сообщений
 				if message.text == "/top":
-					await message.answer(os.getcwd())
+
 					topl, count = top.sort(message.chat.id)
 					text = "Топ пользователей по количеству сообщений:\n"
 					for x_top in range(count):
