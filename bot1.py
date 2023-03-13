@@ -299,7 +299,7 @@ async def echo(message: types.Message): # главная функция
 @dp.message_handler()
 async def choose_your_dinner():
     try:
-    	await bot.edit_message_text(chat_id = -1001647677200, message_id = 3, text = f"Температура {printTemp()} градусов")
+    	await bot.edit_message_text(chat_id = -1001751640711, message_id = 3, text = f"Температура {printTemp()} градусов")
     except Exception:
     	pass
 
