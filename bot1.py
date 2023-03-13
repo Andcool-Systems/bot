@@ -26,7 +26,7 @@ from aiogram.utils.exceptions import (MessageToEditNotFound, MessageCantBeEdited
 from contextlib import suppress
 
 
-start_dir = os.getcwd()
+
 
 from socialc import SocialScore, show, SocialScore_set, SocialScore_setp #Модуль для работы с социальным рейтингом пользователей (самописный)
 '''
@@ -39,7 +39,6 @@ import magic_filter
 
 
 
-os.chdir(start_dir)
 
 finded = False
 triggered = False
