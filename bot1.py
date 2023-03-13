@@ -53,7 +53,7 @@ dp = Dispatcher(bot)
 
 # Открытие файла с плохими словами, и запись его в переменную. Пример: Плохое слово/Плохое слово 2
 try:
-	bad_words_file = open('/home/orangepi/bot/filt_l.txt', 'r', encoding = 'utf-8')
+	bad_words_file = open('/bot/bot/filt_l.txt', 'r', encoding = 'utf-8')
 	
 except Exception:
 	bad_words_file = open('filt_l.txt', 'r', encoding = 'utf-8')
