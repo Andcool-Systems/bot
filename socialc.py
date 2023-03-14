@@ -61,7 +61,7 @@ def SocialScore_setp(id1, am, chat_id):
 	finded = False
 	for sc_c in range(99):
 		if sc[0][sc_c] == id1:
-			sc[2][sc_c] = am
+			sc[1][sc_c] = am
 			finded = True
 
 
@@ -69,7 +69,7 @@ def SocialScore_setp(id1, am, chat_id):
 		for sc_c_n in range(99):
 			if sc[0][sc_c_n] == 0:
 				sc[0][sc_c_n] = id1
-				sc[2][sc_c_n] = am
+				sc[1][sc_c_n] = am
 
 
 				break
