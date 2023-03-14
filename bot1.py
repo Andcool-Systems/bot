@@ -76,7 +76,7 @@ async def echo(message: types.Message): # главная функция
 	top.add(message.from_user.id, message.chat.id) #Сразу пребавляем 1 к количеству сообщений от пользователя message.from_user.id в топ сообщений
 	
 	
-	if message.chat.id == -1001647677200: await message.delete() # Если сообщение отправлено в информационный чат, удаляем его
+	if message.chat.id == -1001751640711: await message.delete() # Если сообщение отправлено в информационный чат, удаляем его
 
 
 	if message.chat.type != "private": # Если сообщение отправлено в общий чат
@@ -300,7 +300,7 @@ async def echo(message: types.Message): # главная функция
 @dp.message_handler()
 async def choose_your_dinner():
     try:
-    	await bot.edit_message_text(chat_id = -1001751640711, message_id = 3, text = f"Температура {printTemp()} градусов")
+    	await bot.edit_message_text(chat_id = -1001751640711, message_id = 18, text = f"Температура {printTemp()} градусов")
     except Exception:
     	pass
 
