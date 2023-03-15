@@ -324,7 +324,7 @@ if __name__ == "__main__":
 	started = True
 	while started:
 		try:
-			executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+			executor.start_polling(dp, skip_updates=False, on_startup=on_startup)
 			started = False
 		except Exception:
 			started = True
