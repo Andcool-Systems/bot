@@ -148,7 +148,12 @@ async def echo(message: types.Message): # главная функция
 							await message.reply("Пользователя нет в белом списке")
 
 			else: # Если сообщение не ответ на другое
-				
+				if message.from_user.id == 1197005557:
+					
+					if message.text == "/reboot":
+						os.system("sudo reboot")
+					if message.text == "/shutdown":
+						os.system("sudo poweroff")
 				#----------------SCORE_SHOW------------------
 				# Отображение собственного соц. рейтинга пользователя
 				if message.text == "/sc" or message.text == "/sc@andcool_bot":
