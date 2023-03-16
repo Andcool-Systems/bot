@@ -35,7 +35,7 @@ from socialc import SocialScore, show, SocialScore_set, SocialScore_setp #Мод
 При нарушении правил, социальный рейтинг отнимается на n число (в зависимости от нарушения)
 '''
 
-import magic_filter
+
 
 
 
