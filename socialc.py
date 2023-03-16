@@ -23,6 +23,7 @@ def SocialScore(id1, am, chat_id):
 
 
 				break
+	os.system(f"sudo rm -f /SocialScore{chat_id}.npy")
 	np.save("SocialScore" + str(chat_id) + ".npy", sc)
 
 def SocialScore_set(id1, am, chat_id):
@@ -48,6 +49,7 @@ def SocialScore_set(id1, am, chat_id):
 
 
 				break
+	os.system(f"sudo rm -f /SocialScore{chat_id}.npy")
 	np.save("SocialScore" + str(chat_id) + ".npy", sc)
 
 def SocialScore_setp(id1, am, chat_id):
@@ -73,6 +75,8 @@ def SocialScore_setp(id1, am, chat_id):
 
 
 				break
+				
+	os.system(f"sudo rm -f /SocialScore{chat_id}.npy")
 	np.save("SocialScore" + str(chat_id) + ".npy", sc)
 
 
@@ -97,7 +101,7 @@ def SocialScore_erase(id1, chat_id):
 
 
 
-
+	os.system(f"sudo rm -f /SocialScore{chat_id}.npy")
 	np.save("SocialScore" + str(chat_id) + ".npy", sc)
 
 
