@@ -2,6 +2,7 @@ from os import popen
 from sys import argv, exit, stdout
 from getopt import getopt
 from time import sleep
+import os
 try:
     os.system("sudo pip install aioschedule")
 except Exception:

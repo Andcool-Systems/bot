@@ -1,15 +1,19 @@
+polit = "путин", "байден", "зеленский", "спецопераци", "войн", "байдэн"
 link = "https://www.youtube.com", "https://www.youtube.ru", "https://vk.com", "https://github.com", "https://aliexpress.ru", "https://www.thingiverse.com" #Список ссылок, которые разрешены в чате
-
+parasite_symbols = "/-*!@#$^&()+=><?№;~'{}[]_ "
 #Импорт необжодимых модулей
-import logging 
+
 from datetime import datetime, date, time, timedelta #Модуль времени
 from aiogram import Bot, Dispatcher, executor, types #Модуль для работы с Телеграм
 import os #модуль для работы с ОС
 import numpy as np #Модуль для работы с массивами
-import random #Модуль рандома
 from temp import printTemp #Модуль для получения температуры cpu сервера (самописный)
 import time #Модуль времени
-import fan #Модуль для работы с вентиляторами CPU (самописный)
+import file_manager
+import spam_class
+import user_log
+import log_manager
+
 
 import white_list #Модуль для обработки белого списка пользователей (самописный)
 '''
@@ -20,11 +24,11 @@ import top #Модуль для работы с топом пользовате�
 
 
 import asyncio
-import aioschedule
+import aioschedule as schedule
 from aiogram.utils.exceptions import (MessageToEditNotFound, MessageCantBeEdited, MessageCantBeDeleted,
                                       MessageToDeleteNotFound)
 from contextlib import suppress
-
+from sys import platform
 
 
 
@@ -38,13 +42,21 @@ from socialc import SocialScore, show, SocialScore_set, SocialScore_setp #Мод
 
 
 
-
+if platform == "linux" or platform == "linux2":
+    linux = True
+elif platform == "win32":
+	linux = False
+#logging.basicConfig(level=logging.CRITICAL)
 
 finded = False
 triggered = False
 up_c = 0
-last_id = 0
-flood = 0
+chat_spam_list = []
+chat_log_list = log_manager.load_data()
+
+flood_num = 5
+maintenace_chat_id = -1001751640711
+msg_id = 18
 
 bot = Bot(token="5896801600:AAH9EgH0oAaH7C2kxsOsjqqNvj0IIEpr6V0") #Токен Телеграм бота
 dp = Dispatcher(bot)
@@ -67,6 +79,8 @@ async def delete_message(message: types.Message, sleep_time: int = 0):
     await asyncio.sleep(sleep_time)
     with suppress(MessageCantBeDeleted, MessageToDeleteNotFound):
         await message.delete()
+	
+
 
 
 @dp.message_handler(content_types=['any'])
@@ -74,38 +88,95 @@ async def delete_message(message: types.Message, sleep_time: int = 0):
 async def echo(message: types.Message): # главная функция
 
 	top.add(message.from_user.id, message.chat.id) #Сразу пребавляем 1 к количеству сообщений от пользователя message.from_user.id в топ сообщений
-	
-	
-	if message.chat.id == -1001751640711: await message.delete() # Если сообщение отправлено в информационный чат, удаляем его
+	global maintenace_chat_id
+	global msg_id
+	if message.chat.id == maintenace_chat_id: await message.delete() # Если сообщение отправлено в информационный чат, удаляем его
+	print(message.content_type)
 
-
-	if message.chat.type != "private": # Если сообщение отправлено в общий чат
-
+	if message.chat.type != "private" and message.chat.id != maintenace_chat_id: # Если сообщение отправлено в общий чат
+		log_txt = []
+		answer_log_txt = []
 		up_c = 0
-		global last_id
-		global flood
+		
+		global flood_num
+		global chat_spam_list
+		global chat_log_list
+
 		triggered = False
+
+		if chat_log_list == []: chat_log_list = [user_log.Chat(message.chat.id)]
+		else:
+			log_finded = False
+			for log_list in chat_log_list:
+				if log_list.chat_id == message.chat.id: log_finded = True
+			if not log_finded: chat_log_list.append(user_log.Chat(message.chat.id))
+		current_chat = -1
+		current_user = -1
+		answer_user = -1
+		
+		for log_list in range(len(chat_log_list)):
+				if chat_log_list[log_list].chat_id == message.chat.id: current_chat = log_list
+
+
+		if chat_log_list[current_chat].users == []: chat_log_list[current_chat].users = [user_log.User(message.from_user.username)]
+		else:
+			user_finded = False
+			for log_list_users in chat_log_list[current_chat].users:
+				if log_list_users.username == message.from_user.username: user_finded = True
+			if not user_finded: chat_log_list[current_chat].users.append(user_log.User(message.from_user.username))
+		
+		for pr in range(len(chat_log_list[current_chat].users)):
+			if chat_log_list[current_chat].users[pr].username == message.from_user.username: current_user = pr
+
+		#print(chat_log_list[current_chat].users[current_user].username)
 		#------------------FLOOD----------------------
 
 		# Проверка на спам
 		'''
-		Считаем количесво сообщений от одного пользователя подряд, если >= 10, -50 социального рейтинга
+		Считаем количесво сообщений от одного пользователя подряд, если >= flood_num, -50 социального рейтинга
 		'''
-		if last_id == message.from_user.id:
-			flood += 1
-		else:
-			flood = 0
-		if flood >=10:
-			await message.answer(message.from_user.first_name + ", прекрати спамить в этом чате!\n" + "Социальный рейтинг понижен на 50.")
-			SocialScore(message.from_user.id, -50, message.chat.id)
-			flood = 0
-			if triggered == False:
-				print(message.from_user.first_name + ', ' + message.text + " -> flood")
-			triggered = True
-		last_id = message.from_user.id
-			#--------------------------------------------
+		position_in_list = -1
+		spam_return = [-1]
+		if len(chat_spam_list) == 0: chat_spam_list = [spam_class.Spam(message.chat.id, flood_num)]
+		else: 
+			for spam_list_found in range(len(chat_spam_list)):
+				if chat_spam_list[spam_list_found].chat_id == message.chat.id: position_in_list = spam_list_found
 
-		if message.content_type == "text": # Если отправлено текстовое сообщение
+			if position_in_list != -1: spam_return = chat_spam_list[position_in_list].tick(message.from_user.id, message, message.text)
+			else:
+				chat_spam_list.append(spam_class.Spam(message.chat.id, flood_num))
+				for spam_list_found in range(len(chat_spam_list)):
+					if chat_spam_list[spam_list_found].chat_id == message.chat.id: 
+						spam_return = chat_spam_list[spam_list_found].tick(message.from_user.id, message, message.text)
+						position_in_list = spam_list_found
+
+		
+		
+		if spam_return[0] != -1:
+			log_txt.append(f"{message.from_user.username}, {message.text} -> spam")
+			await message.answer(f"{message.from_user.first_name}, прекрати спамить в этом чате!\nСоциальный рейтинг понижен на 50.\nМут на 20 минут!")
+			SocialScore(message.from_user.id, -50, message.chat.id)
+			
+			triggered = True
+			dt = datetime.now() + timedelta(minutes=20)
+			timestamp = dt.timestamp()
+			
+			try: await bot.restrict_chat_member(message.chat.id, message.from_user.id, types.ChatPermissions(False), until_date = timestamp)
+			except Exception: pass
+
+			for spam_delete in range(spam_return[1]):
+				try: await spam_return[0][spam_delete].delete()
+				except Exception: pass
+		
+			#--------------------------------------------
+		supported_content = ["text", "photo", "document", "video"]
+		no_text_supported_content = ["photo", "document", "video"]
+		if message.content_type in no_text_supported_content:
+			try:
+				message_txt = message.caption
+			except: message_txt = "."
+		else: message_txt = message.text
+		if message.content_type in supported_content: # Если отправлено текстовое сообщение
 			member = await bot.get_chat_member(message.chat.id, message.from_user.id)
 			
 		#----------------SCORE_SHOW------------------
@@ -114,72 +185,98 @@ async def echo(message: types.Message): # главная функция
 			if message.reply_to_message: # Если проверяемое сообщение - ответ
 				if member.is_chat_admin(): # Если проверяемое сообщение от админа чата
 
-					if message.text == "/sc" or message.text == "/sc@andcool_bot": # Получение соц. рейтинга у пользователя
-						await message.reply("Социальный рейтинг пользователя " + message.reply_to_message.from_user.first_name + " равен " + str(show(message.reply_to_message.from_user.id, message.chat.id)))
+					if chat_log_list[current_chat].users == []: chat_log_list[current_chat].users = [user_log.User(message.reply_to_message.from_user.username)]
+					else:
+						user_finded = False
+						for log_list_users in chat_log_list[current_chat].users:
+							if log_list_users.username == message.reply_to_message.from_user.username: user_finded = True
+						if not user_finded: chat_log_list[current_chat].users.append(user_log.User(message.reply_to_message.from_user.username))
+					
+					for pr in range(len(chat_log_list[current_chat].users)):
+						if chat_log_list[current_chat].users[pr].username == message.reply_to_message.from_user.username: answer_user = pr
 
-					if message.text.find("/sc_set") != -1: # Установка соц. рейтинга для пользователя
-						sc_am = int(message.text[message.text.find("/sc_set") + 8:])
+
+						
+					if message_txt == "/sc" or message_txt == "/sc@andcool_bot": # Получение соц. рейтинга у пользователя
+						await message.reply(f"Социальный рейтинг пользователя {message.reply_to_message.from_user.first_name} равен {show(message.reply_to_message.from_user.id, message.chat.id)}")
+
+					if message_txt.find("/sc_set") != -1: # Установка соц. рейтинга для пользователя
+						sc_am = int(message_txt[message_txt.find("/sc_set") + 8:])
 						SocialScore_set(message.reply_to_message.from_user.id, sc_am, message.chat.id)
+						answer_log_txt.append(f"Set social score for {message.reply_to_message.from_user.first_name} to {round(sc_am)}")
 
-					if message.text.find("/p_set") != -1: # Установка степени наказания для пользователя
-						sc_am = int(message.text[message.text.find("/p_set") + 7:])
+					if message_txt.find("/p_set") != -1: # Установка степени наказания для пользователя
+						sc_am = int(message_txt[message_txt.find("/p_set") + 7:])
 						SocialScore_setp(message.reply_to_message.from_user.id, sc_am, message.chat.id)
+						answer_log_txt.append(f"Set degree of punishment for {message.reply_to_message.from_user.first_name} to {round(sc_am)}")
 
-					if message.text.find("/mute") != -1: # Комманда для запрета пользователь писать в чат на n кол-во времени
-						mute_t = float(message.text[message.text.find("/mute") + 6:])
+					if message_txt.find("/mute") != -1: # Комманда для запрета пользователь писать в чат на n кол-во времени
+						mute_t = float(message_txt[message_txt.find("/mute") + 6:])
+						answer_log_txt.append(f"{message.reply_to_message.from_user.first_name} is muted for {mute_t} hours")
+
 						dt = datetime.now() + timedelta(hours=mute_t)
 						timestamp = dt.timestamp()
 						flood = 0
 						await message.delete()
 						await bot.restrict_chat_member(message.chat.id, message.reply_to_message.from_user.id, types.ChatPermissions(False), until_date = timestamp)
 
-					if message.text.find("/ban") != -1: # Блокировка пользователя
+					if message_txt.find("/ban") != -1: # Блокировка пользователя
+						answer_log_txt.append(f"{message.reply_to_message.from_user.first_name} banned")
 						await message.delete()
 						await bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id, revoke_messages=False)
 
-					if message.text == "/white_list_add": #Добавление пользователя в белый список
+					if message_txt == "/white_list_add": #Добавление пользователя в белый список
 						done = white_list.add_to_whitelist(message.reply_to_message.from_user.id, message.chat.id)
-						if done == False:
-							await message.reply("Пользователь уже в белом списке")
+						if done == False: await message.reply("Пользователь уже в белом списке")
 
-					if message.text == "/white_list_remove": #Удаление пользователя из белого списка
+					if message_txt == "/white_list_remove": #Удаление пользователя из белого списка
 						done = white_list.remove_from_whitelist(message.reply_to_message.from_user.id, message.chat.id)
-						if done == False:
-							await message.reply("Пользователя нет в белом списке")
+						if done == False: await message.reply("Пользователя нет в белом списке")
 
 			else: # Если сообщение не ответ на другое
 				if message.from_user.id == 1197005557:
 					
-					if message.text == "/reboot":
+					if message_txt == "/reboot":
 						os.system("sudo reboot")
-					if message.text == "/shutdown":
+					if message_txt == "/shutdown":
 						os.system("sudo poweroff")
+
+				if member.is_chat_admin():
+					if message_txt.find("/get_chat_id") != -1:
+						await message.delete()
+						msg = await message.answer(f"{message.chat.id}")
+						asyncio.create_task(delete_message(msg, 60))
 				#----------------SCORE_SHOW------------------
 				# Отображение собственного соц. рейтинга пользователя
-				if message.text == "/sc" or message.text == "/sc@andcool_bot":
+				if message_txt == "/sc" or message_txt == "/sc@andcool_bot":
 					await message.delete()
-					msg = await message.answer(message.from_user.first_name + ", ваш социальный рейтинг равен " + str(show(message.from_user.id, message.chat.id)))
+					msg = await message.answer(f"{message.from_user.first_name}, ваш социальный рейтинг равен {show(message.from_user.id, message.chat.id)}")
 					asyncio.create_task(delete_message(msg, 60))
 
+				
+					
+
 				# Отображение топа пользователей по кол-ву сообщений
-				if message.text == "/top":
+				if message_txt == "/top":
 
 					topl, count = top.sort(message.chat.id)
 					text = "Топ пользователей по количеству сообщений:\n"
 					for x_top in range(count):
 						member = await bot.get_chat_member(message.chat.id, round(topl[x_top][0]))
 						text = text + f"{x_top + 1}. {member.user.first_name} - {round(topl[x_top][1])}\n"
-					await message.reply(text)
+					await message.delete()
+					msg = await message.answer(text)
+					asyncio.create_task(delete_message(msg, 120))
 
 
 				#Реализованная, но не использующееся часть кода, отвечающая за игру в русскую рулетку на соц. рейтинг
 
 				'''	
-				if message.text.find("/sc_roulette") != -1:
+				if message_txt.find("/sc_roulette") != -1:
 					try:
 
 						sc_n = show(message.from_user.id, message.chat.id)
-						sc_tx = message.text[message.text.find("/sc_roulette") + 13:]
+						sc_tx = message_txt[message_txt.find("/sc_roulette") + 13:]
 						if sc_tx.find("all") != -1:
 							sc_rl = sc_n - 1
 						else:
@@ -204,13 +301,13 @@ async def echo(message: types.Message): # главная функция
 
 
 				#----------------CAPS_GUARD------------------ часть кода отвечающая за защиту от капса (считает кол-во заглавных букв в сообщении)
-				for mess_ch in range(len(message.text)):
-					if message.text[mess_ch].isupper():
+				for mess_ch in range(len(message_txt)):
+					if message_txt[mess_ch].isupper():
 						up_c += 1
 				#--------------------------------------------
 
-				mess = message.text.lower() # Переводим сообщение в нижний регистр
-
+				mess = message_txt.lower() # Переводим сообщение в нижний регистр
+				
 
 
 				#-------------------------------------------- Проверка, не является ли сообщение ссылкой, если да и её нет в списке разрешённых удаляем и -50 соц. рейтинга
@@ -219,103 +316,185 @@ async def echo(message: types.Message): # главная функция
 					if mess.find(link[i]) != -1:
 						finded_link = True
 					if "https://" in mess and not finded_link:
-						await message.answer("Неизвестные ссылки присылать нельзя! \nСоциальный рейтинг понижен на 50.")
+						dt = datetime.now() + timedelta(minutes=20)
+						timestamp = dt.timestamp()
+			
+						try: await bot.restrict_chat_member(message.chat.id, message.from_user.id, types.ChatPermissions(False), until_date = timestamp)
+						except Exception: pass
+
+						log_txt.append(f"{message.from_user.username}, {message_txt} -> link")
+						await message.answer("Неизвестные ссылки присылать нельзя! \nСоциальный рейтинг понижен на 50.\nМут на 20 минут!")
 						await message.delete()
 						SocialScore(message.from_user.id, -50, message.chat.id)
+						
 						break
 
 				finded_link = False
+				
 				#--------------------------------------------
+				for replace_l in parasite_symbols: mess = mess.replace(str(replace_l), "")
 
-
+				for i in range(len(polit)):
+					if mess.find(polit[i].lower()) != -1:
+						dt = datetime.now() + timedelta(minutes=20)
+						timestamp = dt.timestamp()
+			
+						try: await bot.restrict_chat_member(message.chat.id, message.from_user.id, types.ChatPermissions(False), until_date = timestamp)
+						except Exception: pass
+						log_txt.append(f"{message.from_user.username}, {message_txt} -> polit")
+						await message.answer("Партия запрещать обсуждать политика в этом чате!\nСоциальный рейтинг понижен на 120.\nМут на 20 минут!")
+						await message.delete()
+						SocialScore(message.from_user.id, -120, message.chat.id)
+						
+						break
 				# Проверка на плохие слова. Берём по одному слову из масива и проверяем, есть ли оно в сообщении, если да, то удаляем и -100 соц. рейтинга
 				#----------------FILT------------------------
-				try:
-					for i in range(len(bad_words_list)):
+				
+				for i in range(len(bad_words_list)):
+					try:
 						if mess.find(bad_words_list[i].lower()) != -1:
-							answer = message.from_user.first_name + ", молчать!\n" + "Мат и оскорбления запрещены в этом чате!\n" + "Социальный рейтинг понижен на 100."
+							dt = datetime.now() + timedelta(minutes=20)
+							timestamp = dt.timestamp()
+			
+							try: await bot.restrict_chat_member(message.chat.id, message.from_user.id, types.ChatPermissions(False), until_date = timestamp)
+							except Exception: pass
+
+							log_txt.append(f"{message.from_user.username}, {message_txt} -> bad word")
+							answer = message.from_user.first_name + ", молчать!\n" + "Мат и оскорбления запрещены в этом чате!\n" + "Социальный рейтинг понижен на 100.\nМут на 20 минут!"
 							await message.answer(answer)
 							await message.delete()
 							SocialScore(message.from_user.id, -100, message.chat.id)
-							flood = 0
-							if triggered == False:
-								print(message.from_user.first_name + ', ' + message.text + " -> swearing")
-							triggered = True
+							
 							break
+					except Exception: pass
 					#-------------------------------------------
 
 
 					#-------------CAPS_GUARD-------------------- # Окончательная проверка на капс, если заглавные буквы составляют более 50% от всего сообщения, то -10 соц. рейтинга
-					if(up_c * 100) / len(message.text) >= 50 and len(message.text) >= 4:
-						await message.reply("Писать капсом некультурно!\n" + "Социальный рейтинг понижен на 10.")
-						if triggered == False:
-							print(message.from_user.first_name + ', ' + message.text + " -> CAPS")
-						triggered = True
-						SocialScore(message.from_user.id, -10, message.chat.id)
-						flood = 0
-					#-------------------------------------------
-
-				except Exception:
-					pass
-
+				if(up_c * 100) / len(message_txt) >= 50 and len(message_txt) >= 4:
+					try:
+						dt = datetime.now() + timedelta(minutes=20)
+						timestamp = dt.timestamp()
 			
-
-
+						try: await bot.restrict_chat_member(message.chat.id, message.from_user.id, types.ChatPermissions(False), until_date = timestamp)
+						except Exception: pass
+						await message.reply("Писать капсом некультурно!\n" + "Социальный рейтинг понижен на 10.\nМут на 20 минут!")
+						SocialScore(message.from_user.id, -10, message.chat.id)
+					except Exception: pass
+					log_txt.append(f"{message.from_user.username}, {message_txt} -> caps")
+					
+						
+					#-------------------------------------------
+					
 
 		#------------------------------MUTE-------------------------------------------- 
 		#Алгоритм для запрета пользователю писать в чате на время, если его соц. рейтинг <= 0
 		#Время, на которое запрещается писать с каждым разом увеличивается 12, 24, 36, 48... часов
 		
-		if os.path.exists("SocialScore" + str(message.chat.id) +".npy") == False:
-			sc = np.zeros((3, 100))
-			for sc_c_f in range(99):
-				sc[1][sc_c_f] = 500
+		sc = file_manager.open("SocialScore", message.chat.id, 3)
+		for sc_c in range(len(sc)):
+			if sc[sc_c][1] <= 0 and sc[sc_c][0] != 0:
 
-		else:
-			sc = np.load("SocialScore" + str(message.chat.id) +".npy")
 
-		for sc_c in range(99):
-			#print(sc[1][sc_c])
-			if sc[1][sc_c] == 0 or sc[1][sc_c] < 0:
-				mutted = False
-				member = await bot.get_chat_member(message.chat.id, sc[0][sc_c])
-				print(member)
+				member = await bot.get_chat_member(message.chat.id, sc[sc_c][0])
+
+				
 				if member.status == "member" or member.status == "restricted":
-					sc[2][sc_c] += 1
-					dt = datetime.now() + timedelta(hours=12 * sc[2][sc_c])
-
-					timestamp = dt.timestamp()
-					await message.answer(member.user.first_name + "!\nВы себя плохо ведёте!\n" + "Мут на " + str(round(12 * sc[2][sc_c])) + " часа!\n")
-					mutted = await bot.restrict_chat_member(message.chat.id, sc[0][sc_c], types.ChatPermissions(False), until_date = timestamp)
+					chat_spam_list[position_in_list].spam_count = 0
+					
+					await bot.ban_chat_member(message.chat.id, sc[sc_c][0], revoke_messages=False)
+					log_txt.append(f"{message.from_user.username} banned")
+					
+					
 					
 				
-				sc[1][sc_c] = 300
-				np.save("SocialScore" + str(message.chat.id) +".npy", sc)
+				sc[sc_c][1] = 300
+		file_manager.save("SocialScore", message.chat.id, sc)
+
+		now_time_log = datetime.now()
+
+		now_time_format = "{}.{}.{}-{}:{}".format(now_time_log.day, now_time_log.month, now_time_log.year, now_time_log.hour, now_time_log.minute)
+		if current_chat != -1 and current_user != -1 and log_txt != []:
+			for i_log in log_txt:
+				chat_log_list[current_chat].users[current_user].deleted_messages.append(f"[{now_time_format}] {i_log}")
+
+
+		if current_chat != -1 and answer_user != -1 and answer_log_txt != []:
+			for i_log in answer_log_txt:
+				chat_log_list[current_chat].users[answer_user].deleted_messages.append(f"[{now_time_format}] {i_log}")
+
+		
+		log_manager.save_data(chat_log_list)
+		
 		
 	else:
+		if message.text.find("/send_log") != -1:
+			
+			log_print_list = message.text.split(" ")
+			try:
+				member = await bot.get_chat_member(log_print_list[1], message.from_user.id)
+			
+				if member.status == "creator" or member.status == "administrator":
+					try:
+					#if True:
+					
+						chat_id_print = -1
+						user_id_print = -1
+						for log_list in range(len(chat_log_list)):
+							if chat_log_list[log_list].chat_id == int(log_print_list[1]): chat_id_print = log_list
+						if chat_id_print != -1:
+							for pr in range(len(chat_log_list[chat_id_print].users)):
+								if chat_log_list[chat_id_print].users[pr].username == log_print_list[2]: user_id_print = pr
+							
+							if user_id_print != -1 and chat_log_list[chat_id_print].users[user_id_print].deleted_messages != []:
+								log_file = open('log_file.txt', 'w')
+								for log_txt_write in chat_log_list[chat_id_print].users[user_id_print].deleted_messages:
+									
+									log_file.write(log_txt_write + '\n')
+								log_file.close()
+								log_file_send = open("log_file.txt", 'rb')
+								await bot.send_document(message.chat.id, log_file_send)
+								log_file_send.close()
+							else:
+								await message.answer("На этого пользователя ещё нет логов")
+						else: await message.answer("На этот чат ещё нет логов")
+
+
+					except Exception as e: await message.answer(f"Извините, произошла какая-то ошибка\n{e}")
+				else: await message.answer("Вы не администратор в этом чате!")
+			except Exception: await message.answer("Неправильно указан id чата или бот не состоит в этом чате")
+
+			
+		elif message.text.find("/help") != -1:
+			txt = "Andcool Guard Bot приветствовать вас!\nВы добавить меня в группа и сделать админ.\nЯ навести там порядок!\n" + "Раздаю муты за:\n- Обсуждение политики\n- Нецензурные выражения\n- Сообщения капсом\n- Флуд (куча сообщений подряд)\n\n"
+			txt1 = "Команды для админов (ответь на сообщение цели):\n/sc - социальный рейтинг пользователя\n/sc_set - установка социального рейтинга для пользователя\n/p_set - установка степени наказания для пользователя\n/ban - выгнать участника\n/mute 1 - замутить участника на 1 час\n"
+			txt2 = "\nБелый список - привилегия, на необработку сообщений ботом\nКоманды белого списка (ответь на сообщение цели):\n/white_list_add - добавить пользователя в белый список\n/white_list_remove - удалить пользователя из белого списка"
+			txt3 = "\n/send_log (chat_id) (username)- получить логи пользователя в чате chat_id и именем пользователя username\n/get_chat_id - получить chat_id (использовать в чате)"
+			await bot.send_message(chat_id = message.from_user.id, text = txt + txt1 + txt2 + txt3)
+
 		
-		txt = "Andcool Guard Bot приветствовать вас!\nВы добавить меня в группа и сделать админ.\nЯ навести там порядок!\n" + "Раздаю муты за:\n- Обсуждение политики\n- Нецензурные выражения\n- Сообщения капсом\n- Флуд (куча сообщений подряд)\n\n"
-		txt1 = "Команды для админов (ответь на сообщение цели):\n/sc - социальный рейтинг пользователя\n/sc_set - установка социального рейтинга для пользователя\n/p_set - установка степени наказания для пользователя\n/ban - выгнать участника\n/mute 1 - замутить участника на 1 час\n"
-		txt2 = "\nБелый список - привилегия, на необработку сообщений ботом\nКоманды белого списка (ответь на сообщение цели):\n/white_list_add - добавить пользователя в белый список\n/white_list_remove - удалить пользователя из белого списка"
-		await bot.send_message(chat_id = message.from_user.id, text = txt + txt1 + txt2)
+				
 
 	#------------------------------------------------------------------------------
 
 
 @dp.message_handler()
-async def choose_your_dinner():
-    try:
-    	await bot.edit_message_text(chat_id = -1001751640711, message_id = 18, text = f"Температура {round(printTemp(), 1)}°C")
-    except Exception:
-    	pass
+async def update_temp():
+	try:
+		if linux == True:
+			fan_state = os.system("sudo cat /sys/class/gpio/gpio228/value")
+			await bot.edit_message_text(chat_id = maintenace_chat_id, message_id = msg_id, text = f"Температура {round(printTemp(), 1)}°C {fan_state}")
+	except Exception:
+		pass
+		
 
 
-
+      
 
 async def scheduler():
-    aioschedule.every(5).seconds.do(choose_your_dinner)
+    schedule.every(5).seconds.do(update_temp)
     while True:
-        await aioschedule.run_pending()
+        await schedule.run_pending()
         await asyncio.sleep(1)
         
 async def on_startup(dp): 
@@ -331,5 +510,3 @@ if __name__ == "__main__":
 			print("An error has occurred, reboot in 10 seconds")
 			time.sleep(10)
 			print("rebooting...")
-
-
